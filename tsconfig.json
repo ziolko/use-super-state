@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "jsx": "react",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "outDir": "src",
+    "strict": true,
+    "target": "esnext"
+  }
+}
