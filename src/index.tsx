@@ -58,7 +58,10 @@ export function useSuperState<T>(path: SuperStatePath<T>): SuperState<T> {
   return result as any;
 }
 
-export function useComputedSuperState<V, S = undefined>(getter: () => V, dependencies?: unknown[], memoizedSetter?: S): S extends undefined ? ReadOnlySuperState<V> : SuperState<V> {
+export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown[]): ReadOnlySuperState<V>;
+export function useComputedSuperState<V>(getter: () => V, dependencies: unknown[], memoizedSetter: (value: V) => void): SuperState<V>;
+
+export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown[], memoizedSetter?: (value: V) => void): any {
   const memoizedGetter = useCallback(getter, dependencies as any);
   const result = {};
 
