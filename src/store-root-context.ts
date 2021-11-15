@@ -1,4 +1,4 @@
-import { StoreFactory, StoreProxy } from "./types";
+import { StoreFactory, StoreProxy, Subscriber } from "./types";
 import StoreState from "./store-state";
 import { storeFactory, storeOptions } from "./path-proxy";
 
@@ -20,3 +20,11 @@ export default class StoreRootContext {
     this.getStore(path).setValue(path, value);
   };
 }
+
+export const dependencyTracking: {
+  addDependency: ((subscribe: (subscriber: Subscriber) => () => void) => void) | null,
+  batchedUpdates: (Set<() => void>) | null
+} = {
+  addDependency: null,
+  batchedUpdates: null
+};

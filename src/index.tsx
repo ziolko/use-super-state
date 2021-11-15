@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "use-sync-external-store/shim";
 
 import { ReadOnlySuperState, StoreProxy, Subscriber, SuperState, SuperStore, SynchronousCallback } from "./types";
 import ComputedState from "./computed-state";
-import StoreRootContext from "./store-root-context";
+import StoreRootContext, { dependencyTracking } from "./store-root-context";
 import { createPathProxy, storePathHash } from "./path-proxy";
 
 export function SuperStoreProvider({ children }: PropsWithChildren<{}>) {
@@ -98,10 +98,3 @@ export function superAction<T>(execute: SynchronousCallback<T>) {
 // Internal details
 const storeRootContext = createContext<StoreRootContext | null>(null);
 
-export const dependencyTracking: {
-  addDependency: ((subscribe: (subscriber: Subscriber) => () => void) => void) | null,
-  batchedUpdates: (Set<() => void>) | null
-} = {
-  addDependency: null,
-  batchedUpdates: null
-};

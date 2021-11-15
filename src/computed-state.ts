@@ -1,5 +1,5 @@
 import { Subscriber } from "./types";
-import { dependencyTracking } from "./index";
+import { dependencyTracking } from "./store-root-context";
 
 export default class ComputedState {
   static get(factory: () => unknown) {

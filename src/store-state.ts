@@ -1,7 +1,7 @@
 import { PathNode, StoreFactory, StoreOptions, StoreProxy, Subscriber } from "./types";
 import ReactDOM from "react-dom";
-import { dependencyTracking } from "./index";
 import { storePath } from "./path-proxy";
+import { dependencyTracking } from "./store-root-context";
 
 export default class StoreState<T> {
   factory: StoreFactory<T>;
