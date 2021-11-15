@@ -1,28 +1,28 @@
-import { PathNode, StoreFactory, StoreOptions, StoreProxy, Subscriber } from "./types";
+import { PathNode, SuperStateFactory, SuperStateOptions, SuperStatePath, Subscriber } from "./types";
 import ReactDOM from "react-dom";
 import { storePath } from "./path-proxy";
 import { dependencyTracking } from "./store-root-context";
 
 export default class StoreState<T> {
-  factory: StoreFactory<T>;
-  options?: StoreOptions;
+  factory: SuperStateFactory<T>;
+  options?: SuperStateOptions;
   value: T;
   rootSubscribers = new Set<Subscriber>();
   subscribersMap = new Map<string | Symbol, Set<Subscriber>>();
 
-  constructor(factory: StoreFactory<T>, options?: StoreOptions) {
+  constructor(factory: SuperStateFactory<T>, options?: SuperStateOptions) {
     this.factory = factory;
     this.options = options;
     this.value = factory();
   }
 
-  getValue = <V>(pathProxy: StoreProxy<V>) => {
+  getValue = <V>(pathProxy: SuperStatePath<V>) => {
     const path = pathProxy[storePath];
     dependencyTracking.addDependency?.((subscriber) => this.subscribe(pathProxy, subscriber));
     return path.reduce((acc: any, arg: string | symbol) => acc?.[arg], this.value);
   };
 
-  setValue = <V>(pathProxy: StoreProxy<V>, newValue: V) => {
+  setValue = <V>(pathProxy: SuperStatePath<V>, newValue: V) => {
     const path = pathProxy[storePath];
 
     const oldValue = this.getValue(pathProxy);
@@ -41,7 +41,7 @@ export default class StoreState<T> {
     });
   };
 
-  subscribe = <V>(pathProxy: StoreProxy<V>, subscriber: Subscriber) => {
+  subscribe = <V>(pathProxy: SuperStatePath<V>, subscriber: Subscriber) => {
     const path = pathProxy[storePath];
 
     let subscribers = path.length === 0 ? this.rootSubscribers : this.subscribersMap.get(path[0]);

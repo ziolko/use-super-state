@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 
 import { createSuperState, superAction, useComputedSuperState, useSuperState, useLazySuperState } from "../src";
 import { fireEvent, render, screen, waitFor } from "./test-utils";
-import { SuperStore } from "../src/types";
+import { LazySuperState } from "../src/types";
 
 test("Render computed value", async () => {
   const onRender = jest.fn();
@@ -81,34 +81,6 @@ type Card = {
   width: number;
   height: number;
   text: string;
-}
-
-const cardSync = createSuperState<{ [key: string]: { count: number, stop: () => void, timestamp: number } }>(() => ({}));
-const cardStore = createSuperState<{ [key: string]: { name: "test" } | Card }>(() => ({}));
-
-function syncCardEffect(store: SuperStore, cardId: string) {
-  const syncPath = cardSync[cardId];
-
-  if (store.get(syncPath)?.count) {
-    store.set(syncPath, { count: 1, stop: () => null, timestamp: Date.now() });
-    // start card subscription here
-  }
-
-  return () => {
-    const sub = store.get(syncPath);
-    store.set(syncPath, ({ ...sub, count: sub.count - 1 }));
-    if (sub.count <= 1) {
-      //end card subscription here
-    }
-  };
-}
-
-function useCard(cardId: string) {
-  const store = useLazySuperState();
-
-  useEffect(() => syncCardEffect(store, cardId), [store, cardId]);
-
-  return useSuperState(cardStore[cardId]);
 }
 
 function LiveComponent({ onRender, onSelector }: TestComponentProps) {

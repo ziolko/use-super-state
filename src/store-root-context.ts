@@ -1,10 +1,10 @@
-import { StoreFactory, StoreProxy, Subscriber } from "./types";
+import { SuperStateFactory, SuperStatePath, Subscriber } from "./types";
 import StoreState from "./store-state";
 import { storeFactory, storeOptions } from "./path-proxy";
 
 export default class StoreRootContext {
-  stores = new Map<StoreFactory<unknown>, StoreState<unknown>>();
-  getStore = <T extends unknown>(path: StoreProxy<T>) => {
+  stores = new Map<SuperStateFactory<unknown>, StoreState<unknown>>();
+  getStore = <T extends unknown>(path: SuperStatePath<T>) => {
     const factory = path[storeFactory];
     let result = this.stores.get(factory);
     if (!result) {
@@ -13,10 +13,10 @@ export default class StoreRootContext {
     }
     return result;
   };
-  getValue = <T extends unknown>(path: StoreProxy<T>) => {
+  getValue = <T extends unknown>(path: SuperStatePath<T>) => {
     return this.getStore(path).getValue(path);
   };
-  setValue = <T extends unknown>(path: StoreProxy<T>, value: T) => {
+  setValue = <T extends unknown>(path: SuperStatePath<T>, value: T) => {
     this.getStore(path).setValue(path, value);
   };
 }

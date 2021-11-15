@@ -1,11 +1,11 @@
-import { PathNode, StoreOptions } from "./types";
+import { PathNode, SuperStateOptions } from "./types";
 
 export const storeOptions = Symbol("store options");
 export const storeFactory = Symbol("Store factory");
 export const storePath = Symbol("store path");
 export const storePathHash = Symbol("store path hash");
 
-export function createPathProxy(factory, options: StoreOptions, path: PathNode[] = []) {
+export function createPathProxy(factory, options: SuperStateOptions, path: PathNode[] = []) {
   return new Proxy({} as any, {
     get(target, prop: PathNode) {
       switch (prop) {

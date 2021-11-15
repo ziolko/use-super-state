@@ -1,17 +1,15 @@
-export type StoreFactory<T> = () => T;
-export type StoreOptions = { name?: string }
-export type PathNode = string | symbol;
+export type SuperStateFactory<T> = () => T;
+export type SuperStateOptions = { name?: string }
 
-export type SuperStore = { get<T>(path: StoreProxy<T>): T, set<T>(path: StoreProxy<T>, value: T): void };
-export type StoreProxy<T> = [T] extends [object] ? StoreProxyObject<T> : StoreProxyLeaf<T>;
-export type StoreProxyObject<T extends object> = { readonly [Property in keyof T]: StoreProxy<T[Property]>; }
-export type StoreProxyLeaf<T> = T;
+export type LazySuperState = [<T>(path: SuperStatePath<T>) => T, <T>(path: SuperStatePath<T>, value: T) => void];
 
-export type FieldSetterOptions = { action?: string };
+export type SuperStatePath<T> = [T] extends [object] ? SuperStatePathObject<T> : SuperStatePathLeaf<T>;
+export type SuperStatePathObject<T extends object> = { readonly [Property in keyof T]: SuperStatePath<T[Property]>; }
+export type SuperStatePathLeaf<T> = T;
 
 export type SuperState<Value> = {
-  live: [Value, (value: Value, options?: FieldSetterOptions) => void, () => Value];
-  lazy: [() => Value, (value: Value, options?: FieldSetterOptions) => void];
+  live: [Value, (value: Value, options?: SuperStateSetterOptions) => void, () => Value];
+  lazy: [() => Value, (value: Value, options?: SuperStateSetterOptions) => void];
 };
 
 export type ReadOnlySuperState<Value> = {
@@ -19,6 +17,7 @@ export type ReadOnlySuperState<Value> = {
   lazy: [() => Value];
 };
 
+export type SuperStateSetterOptions = { action?: string };
 export type Subscriber = () => void;
-
+export type PathNode = string | symbol;
 export type SynchronousCallback<T> = (...args: any[]) => T extends Promise<any> ? never : T

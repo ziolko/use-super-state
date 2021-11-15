@@ -2,7 +2,14 @@ import React, { createContext, PropsWithChildren, useCallback, useContext, useMe
 import ReactDOM from "react-dom";
 import { useSyncExternalStore } from "use-sync-external-store/shim";
 
-import { ReadOnlySuperState, StoreProxy, Subscriber, SuperState, SuperStore, SynchronousCallback } from "./types";
+import {
+  LazySuperState,
+  ReadOnlySuperState,
+  Subscriber,
+  SuperState,
+  SuperStatePath,
+  SynchronousCallback
+} from "./types";
 import ComputedState from "./computed-state";
 import StoreRootContext, { dependencyTracking } from "./store-root-context";
 import { createPathProxy, storePathHash } from "./path-proxy";
@@ -12,11 +19,11 @@ export function SuperStateProvider({ children }: PropsWithChildren<{}>) {
   return <storeRootContext.Provider value={value} children={children} />;
 }
 
-export function createSuperState<T extends object>(factory: () => T, options?: { name?: string }): StoreProxy<T> {
+export function createSuperState<T extends object>(factory: () => T, options?: { name?: string }): SuperStatePath<T> {
   return createPathProxy(factory, options ?? {});
 }
 
-export function useSuperState<T>(path: StoreProxy<T>): SuperState<T> {
+export function useSuperState<T>(path: SuperStatePath<T>): SuperState<T> {
   const rootContext = useContext(storeRootContext);
 
   if (!rootContext) {
@@ -75,13 +82,13 @@ export function useComputedSuperState<V, S = undefined>(getter: () => V, depende
   return result as any;
 }
 
-export function useLazySuperState(): SuperStore {
+export function useLazySuperState(): LazySuperState {
   const rootContext = useContext(storeRootContext);
   if (!rootContext) {
     throw  new Error("Not in context of the SuperStoreProvider");
   }
 
-  return useMemo(() => ({ get: rootContext.getValue, set: rootContext.setValue }), [rootContext]);
+  return useMemo(() => ([rootContext.getValue, rootContext.setValue]), [rootContext]);
 }
 
 export function superAction<T>(execute: SynchronousCallback<T>) {
