@@ -10,7 +10,7 @@ export type StoreProxyLeaf<T> = T;
 export type FieldSetterOptions = { action?: string };
 
 export type SuperState<Value> = {
-  live: [Value, (value: Value, options?: FieldSetterOptions) => void, () => Value | undefined];
+  live: [Value, (value: Value, options?: FieldSetterOptions) => void, () => Value];
   lazy: [() => Value, (value: Value, options?: FieldSetterOptions) => void];
 };
 

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 
-import { createSuperStore, superAction, useSuperComputed, useSuperState, useSuperStore } from "../src";
+import { createSuperState, superAction, useComputedSuperState, useSuperState, useLazySuperState } from "../src";
 import { fireEvent, render, screen, waitFor } from "./test-utils";
 import { SuperStore } from "../src/types";
 
@@ -71,7 +71,7 @@ test("Should not recompute when selector is no longer used", async () => {
   // TODO
 });
 
-const testStore = createSuperStore(() => ({ value1: "hello", value2: "world" }));
+const testStore = createSuperState(() => ({ value1: "hello", value2: "world" }));
 type TestComponentProps = { onRender: () => void, onSelector?: () => void };
 
 type Card = {
@@ -83,8 +83,8 @@ type Card = {
   text: string;
 }
 
-const cardSync = createSuperStore<{ [key: string]: { count: number, stop: () => void, timestamp: number } }>(() => ({}));
-const cardStore = createSuperStore<{ [key: string]: { name: "test" } | Card }>(() => ({}));
+const cardSync = createSuperState<{ [key: string]: { count: number, stop: () => void, timestamp: number } }>(() => ({}));
+const cardStore = createSuperState<{ [key: string]: { name: "test" } | Card }>(() => ({}));
 
 function syncCardEffect(store: SuperStore, cardId: string) {
   const syncPath = cardSync[cardId];
@@ -104,7 +104,7 @@ function syncCardEffect(store: SuperStore, cardId: string) {
 }
 
 function useCard(cardId: string) {
-  const store = useSuperStore();
+  const store = useLazySuperState();
 
   useEffect(() => syncCardEffect(store, cardId), [store, cardId]);
 
@@ -127,7 +127,7 @@ function LiveComponent({ onRender, onSelector }: TestComponentProps) {
     setValue2("mundi");
   }, [setValue1, setValue2]);
 
-  const [computed] = useSuperComputed(() => {
+  const [computed] = useComputedSuperState(() => {
     onSelector?.();
     return `${getValue1()} ${getValue2()}`;
   }, [getValue1, getValue2, onSelector]).live;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { createSuperStore, useSuperState } from "../src";
+import { createSuperState, useSuperState } from "../src";
 import { ComponentProps, fireEvent, render, screen, waitFor } from "./test-utils";
 
 test("Render initial value", async () => {
@@ -74,7 +74,7 @@ type Store = {
   nested?: { value: number } []
 }
 
-const testStore = createSuperStore<Store>(() => ({ value: 0, nested: [{ value: 0 }, { value: 12 }] }));
+const testStore = createSuperState<Store>(() => ({ value: 0, nested: [{ value: 0 }, { value: 12 }] }));
 
 function LiveComponent({ onRender }: ComponentProps) {
   const [value, setValue, getValue] = useSuperState(testStore.nested?.[0].value).live;

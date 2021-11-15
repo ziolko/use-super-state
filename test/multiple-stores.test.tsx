@@ -1,7 +1,7 @@
 import React from "react";
 import "@testing-library/jest-dom";
 
-import { createSuperStore, useSuperState } from "../src";
+import { createSuperState, useSuperState } from "../src";
 import { fireEvent, render, screen, waitFor } from "./test-utils";
 
 test("Initializes two stores", async () => {
@@ -43,8 +43,8 @@ test("Updating second store does not affect first store", async () => {
   });
 });
 
-const firstStore = createSuperStore(() => ({ value: 0 }));
-const secondStore = createSuperStore(() => ({ value: 10 }));
+const firstStore = createSuperState(() => ({ value: 0 }));
+const secondStore = createSuperState(() => ({ value: 10 }));
 
 function TwoStores() {
   const [value1, setValue1, getValue1] = useSuperState(firstStore.value).live;

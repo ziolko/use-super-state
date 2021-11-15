@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 
-import { createSuperStore, useSuperComputed, useSuperState } from "../src";
+import { createSuperState, useComputedSuperState, useSuperState } from "../src";
 import { fireEvent, render, screen, waitFor } from "./test-utils";
 
 test("Should compute shared selector only once", async () => {
@@ -36,7 +36,7 @@ test("Should recompute shared selector only once after dependency change", async
 
 
 
-const testStore = createSuperStore(() => ({ value: 0 }));
+const testStore = createSuperState(() => ({ value: 0 }));
 type TestComponentProps = { onRender: () => void, onSelector?: () => void };
 
 function ParentComponent({ onRender, onSelector }: TestComponentProps) {
@@ -46,7 +46,7 @@ function ParentComponent({ onRender, onSelector }: TestComponentProps) {
     return `computed: ${getValue()}`;
   }, [getValue, onSelector]);
 
-  const [computed] = useSuperComputed(selector).live;
+  const [computed] = useComputedSuperState(selector).live;
 
   onRender();
 
@@ -61,6 +61,6 @@ function ParentComponent({ onRender, onSelector }: TestComponentProps) {
 }
 
 function ChildComponent(props: { id: number, selector: () => string }) {
-  const [computed] = useSuperComputed(props.selector).live;
+  const [computed] = useComputedSuperState(props.selector).live;
   return <div data-testid={`value-child-${props.id}`}>{computed}</div>;
 }

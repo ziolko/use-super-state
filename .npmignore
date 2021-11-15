@@ -1,2 +1,10 @@
+.husky
+.idea
+.parcel-cache
+.jest.config.js
+.prettierignore
+.prettierrc.json
+tsconfig.json
+jest.config.js
 src
 test

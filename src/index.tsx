@@ -7,22 +7,13 @@ import ComputedState from "./computed-state";
 import StoreRootContext, { dependencyTracking } from "./store-root-context";
 import { createPathProxy, storePathHash } from "./path-proxy";
 
-export function SuperStoreProvider({ children }: PropsWithChildren<{}>) {
+export function SuperStateProvider({ children }: PropsWithChildren<{}>) {
   const value = useMemo(() => new StoreRootContext(), []);
   return <storeRootContext.Provider value={value} children={children} />;
 }
 
-export function createSuperStore<T extends object>(factory: () => T, options?: { name?: string }): StoreProxy<T> {
+export function createSuperState<T extends object>(factory: () => T, options?: { name?: string }): StoreProxy<T> {
   return createPathProxy(factory, options ?? {});
-}
-
-export function useSuperStore(): SuperStore {
-  const rootContext = useContext(storeRootContext);
-  if (!rootContext) {
-    throw  new Error("Not in context of the SuperStoreProvider");
-  }
-
-  return useMemo(() => ({ get: rootContext.getValue, set: rootContext.setValue }), [rootContext]);
 }
 
 export function useSuperState<T>(path: StoreProxy<T>): SuperState<T> {
@@ -60,7 +51,7 @@ export function useSuperState<T>(path: StoreProxy<T>): SuperState<T> {
   return result as any;
 }
 
-export function useSuperComputed<V, S = undefined>(getter: () => V, dependencies?: unknown[], memoizedSetter?: S): S extends undefined ? ReadOnlySuperState<V> : SuperState<V> {
+export function useComputedSuperState<V, S = undefined>(getter: () => V, dependencies?: unknown[], memoizedSetter?: S): S extends undefined ? ReadOnlySuperState<V> : SuperState<V> {
   const memoizedGetter = useCallback(getter, dependencies as any);
   const result = {};
 
@@ -84,8 +75,13 @@ export function useSuperComputed<V, S = undefined>(getter: () => V, dependencies
   return result as any;
 }
 
-function errorSetter() {
-  throw new Error("No setter has been defined for the computed field");
+export function useLazySuperState(): SuperStore {
+  const rootContext = useContext(storeRootContext);
+  if (!rootContext) {
+    throw  new Error("Not in context of the SuperStoreProvider");
+  }
+
+  return useMemo(() => ({ get: rootContext.getValue, set: rootContext.setValue }), [rootContext]);
 }
 
 export function superAction<T>(execute: SynchronousCallback<T>) {
@@ -98,3 +94,6 @@ export function superAction<T>(execute: SynchronousCallback<T>) {
 // Internal details
 const storeRootContext = createContext<StoreRootContext | null>(null);
 
+function errorSetter() {
+  throw new Error("No setter has been defined for the computed field");
+}

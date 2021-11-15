@@ -1,6 +1,6 @@
 import React from "react";
 
-import { createSuperStore, useSuperComputed, useSuperState } from "../src";
+import { createSuperState, useComputedSuperState, useSuperState } from "../src";
 import { fireEvent, render, screen, waitFor } from "./test-utils";
 
 test("Should re-use computed value if is a dependency of another computed value", async () => {
@@ -30,18 +30,18 @@ test("Should recompute value dependant on another computed value", async () => {
   expect(onRender).toBeCalledTimes(2);
 });
 
-const testStore = createSuperStore(() => ({ value: 0 }));
+const testStore = createSuperState(() => ({ value: 0 }));
 type TestComponentProps = { onRender: () => void, onSelector?: () => void };
 
 function TestComponent({ onRender, onSelector }: TestComponentProps) {
   const [getValue, setValue] = useSuperState(testStore.value).lazy;
 
-  const [computed, , getComputed] = useSuperComputed(() => {
+  const [computed, , getComputed] = useComputedSuperState(() => {
     onSelector?.();
     return { result: getValue() };
   }, [onSelector, getValue]).live;
 
-  const [dependantComputed] = useSuperComputed(() => getComputed(), [getComputed]).live;
+  const [dependantComputed] = useComputedSuperState(() => getComputed(), [getComputed]).live;
 
   onRender();
 

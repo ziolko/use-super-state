@@ -1,6 +1,6 @@
 {
   "name": "use-super-state",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "description": "Shared state manager for ReactJS",
   "source": "src/index.tsx",
   "main": "dist/main.js",
@@ -9,7 +9,8 @@
   "scripts": {
     "test": "jest",
     "build": "parcel build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [],
   "author": "Mateusz Zieliński <mateusz@roombelt.com>",
