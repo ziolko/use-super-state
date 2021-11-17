@@ -1,7 +1,10 @@
 export type SuperStateFactory<T> = () => T;
 export type SuperStateOptions = { name?: string }
 
-export type LazySuperState = [<T>(path: SuperStatePath<T>) => T, <T>(path: SuperStatePath<T>, value: T) => void];
+export type LazySuperState = [<T>(path: SuperStatePath<T>) => T, <T>(path: SuperStatePath<T>, value: T) => void] & {
+  get<T>(path: SuperStatePath<T>): T,
+  set<T>(path: SuperStatePath<T>, value: T): void;
+};
 
 export type SuperStatePath<T> = [T] extends [object] ? SuperStatePathObject<T> : SuperStatePathLeaf<T>;
 export type SuperStatePathObject<T extends object> = { readonly [Property in keyof T]: SuperStatePath<T[Property]>; }

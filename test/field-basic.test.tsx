@@ -1,6 +1,6 @@
 import React from "react";
 
-import { createSuperState, useSuperState } from "../src";
+import { createSuperState, useLazySuperState, useSuperState } from "../src";
 import { ComponentProps, fireEvent, render, screen, waitFor } from "./test-utils";
 
 test("Render initial value", async () => {

@@ -8,6 +8,8 @@ import {
   Subscriber,
   SuperState,
   SuperStatePath,
+  SuperStatePathLeaf,
+  SuperStatePathObject,
   SynchronousCallback
 } from "./types";
 import ComputedState from "./computed-state";
@@ -35,7 +37,7 @@ export function useSuperState<T>(path: SuperStatePath<T>): SuperState<T> {
 
   // When any item of the [storeObj, pathHash] pair changes we should return new callbacks
   const getValue = useCallback(() => storeObj.getValue(path), [storeObj, pathHash]);
-  const setValue = useCallback((value: unknown) => storeObj.setValue(path, value), [storeObj, pathHash]);
+  const setValue = useCallback((value: unknown) => storeObj.setValue(path as any, value), [storeObj, pathHash]);
 
   const result = {};
   Object.defineProperties(result, {
@@ -91,7 +93,12 @@ export function useLazySuperState(): LazySuperState {
     throw  new Error("Not in context of the SuperStoreProvider");
   }
 
-  return useMemo(() => ([rootContext.getValue, rootContext.setValue]), [rootContext]);
+  return useMemo(() => {
+    const result = ([rootContext.getValue, rootContext.setValue]) as LazySuperState;
+    result.get = rootContext.getValue;
+    result.set = rootContext.setValue;
+    return result;
+  }, [rootContext]);
 }
 
 export function superAction<T>(execute: SynchronousCallback<T>) {
