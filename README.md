@@ -58,15 +58,19 @@ export default function App() {
 import React from 'react';
 import { createSuperState, useSuperState, useComputedSuperState } from "use-super-state";
 
+// useSupportState is written in TypeScript and has full support for it
 type User = {
   firstName: string;
   lastName: string;
   age: number | null;
 };
 
+// Create stores. They can be created wherever possible e.g. each big functionality 
+// can have its own store.
 const usersIndexState = createSuperState(() => ({} as Record<string, boolean | undefined>))
 const usersState = createSuperState(() => ({} as Record<string, user | undefined>));
 
+// I encourage extracting 
 function useUser(userId: string) {
   return useSuperState(usersState[userId]);
 }
@@ -93,7 +97,6 @@ const User = React.memo((props: { id: string }) => {
 
   return <div>{user.firstName}</div>
 })
-
 ```
 
 ### API documentation
