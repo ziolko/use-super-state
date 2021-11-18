@@ -52,41 +52,53 @@ export default function App() {
 }
 ```
 
-## Usage
-
-### Create a shared state
+## Example
 
 ```tsx
-import { createSuperState } from "use-super-state";
+import React from 'react';
+import { createSuperState, useSuperState, useComputedSuperState } from "use-super-state";
 
-type FormState = {
+type User = {
   firstName: string;
   lastName: string;
   age: number | null;
+};
+
+const usersIndexState = createSuperState(() => ({} as Record<string, boolean | undefined>))
+const usersState = createSuperState(() => ({} as Record<string, user | undefined>));
+
+function useUser(userId: string) {
+  return useSuperState(usersState[userId]);
 }
 
-const userFormSuperState = createSuperState<FormState>({ firstName: "", lastName: "", age: null })
-```
+function useUsersList() {
+  const [getIndex] = useComputedState(usersIndexState).lazy;
 
-### Get, set form state
-
-```tsx
-import { useSuperState } from "./index";
-
-function AgeField() {
-  const [age, setAge, getAge] = useSuperState().live;
-  
-  return <input type="number" value={age} onChange={e => setAge(e.target.value)} />
+  return useComputedSuperState(() => {
+    return Object.entries(getIndex()).filter(([userId, value]) => value).map(([userId]) => userId)
+  }, [getIndex]);
 }
+
+function Users() {
+  const [usersIds] = useUsersList().live
+  return (
+    <>
+      {usersIds.map((userId) => <User id={userId} key={userId} />)}
+    </>
+  );
+}
+
+const User = React.memo((props: { id: string }) => {
+  const [user, setUser] = useUser(props.id);
+
+  return <div>{user.firstName}</div>
+})
+
 ```
 
-1. It needs to be easy to create a shared stet
+### API documentation
 
-2. Computed state as a
-
-3. Small API surface - should take no more than 10 minutes to grasp all the ideas
-4. Performance - minimizes
-5.
+TODO
 
 ## License
 
