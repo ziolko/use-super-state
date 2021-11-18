@@ -66,17 +66,25 @@ type User = {
 };
 
 // Create stores. They can be created wherever possible e.g. each big functionality 
-// can have its own store.
+// can have its own store. I create two stores below for demonstration purposes.
 const usersIndexState = createSuperState(() => ({} as Record<string, boolean | undefined>))
-const usersState = createSuperState(() => ({} as Record<string, user | undefined>));
+const usersState = createSuperState(() => ({} as Record<string, User | undefined>));
 
-// I encourage extracting 
+// Use this hook whereven in the application code to get user with given ID from the store.
+// You can add any data loading logic here in a useEffect.
 function useUser(userId: string) {
+  // The parameter for useSuperState has similar role to a redux selector. 
+  // The object usersState[userId] doesn't isn't a value of this path in store, but 
+  // represents a selector of this path.
   return useSuperState(usersState[userId]);
 }
 
+// An example of a computed property. It doesn't return value directly from
+// the store, but computes it based on one or many paths in the store. 
 function useUsersList() {
-  const [getIndex] = useComputedState(usersIndexState).lazy;
+  // Notice the .lazy part. This means the component using this hook does not rerender
+  // every time usersIndexState changes.
+  const [getIndex] = useState(usersIndexState).lazy;
 
   return useComputedSuperState(() => {
     return Object.entries(getIndex()).filter(([userId, value]) => value).map(([userId]) => userId)
