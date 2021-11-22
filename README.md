@@ -1,6 +1,6 @@
 # useSuperStore 🌟
 
-The React state management library mady by me for myself.
+The React state management library made by me for myself.
 
 ## Installation
 
