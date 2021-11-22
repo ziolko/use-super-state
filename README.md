@@ -1,16 +1,6 @@
 # useSuperStore 🌟
 
-The React state management library we all deserve.
-
-## Why?
-
-No new state management library appeared today 😲 I had no choice, but create one to save the day.
-
-## But seriously, why?
-
-I see the React community trapped into the Redux-like approach to state management. It's decent but as a community we
-need to experiment with new approaches to avoid being stuck in the
-[local optimum](https://en.wikipedia.org/wiki/Local_optimum).
+The React state management library mady by me for myself.
 
 ## Installation
 
@@ -52,64 +42,42 @@ export default function App() {
 }
 ```
 
-## Example
+## API
 
 ```tsx
-import React from 'react';
-import { createSuperState, useSuperState, useComputedSuperState } from "use-super-state";
 
-// useSupportState is written in TypeScript and has full support for it
-type User = {
-  firstName: string;
-  lastName: string;
-  age: number | null;
-};
+// Create store
+const superState = createSuperState(() => ({ counter: 0 }));
 
-// Create stores. They can be created wherever possible e.g. each big functionality 
-// can have its own store. I create two stores below for demonstration purposes.
-const usersIndexState = createSuperState(() => ({} as Record<string, boolean | undefined>))
-const usersState = createSuperState(() => ({} as Record<string, User | undefined>));
+// Live selector forces re-render whenever the state changes 
+const [counter, setIncrement, getIncrement] = useSuperState(superState.counter).live;
 
-// Use this hook whereven in the application code to get user with given ID from the store.
-// You can add any data loading logic here in a useEffect.
-function useUser(userId: string) {
-  // The parameter for useSuperState has similar role to a redux selector. 
-  // The object usersState[userId] doesn't isn't a value of this path in store, but 
-  // represents a selector of this path.
-  return useSuperState(usersState[userId]);
+// Lazy selector never forces re-render 
+const [getIncrement, setIncrement] = useSuperState(superState.counter).lazy;
+
+// Get or set any field in any store. Useful e.g. in callbacks if they involve many 
+// or dynamically determined fields.
+const [getValue, setValue] = useLazySuperState();
+
+const counter = getValue(superState.counter);
+setValue(superState.counter, 12);
+
+const [getCounter, incrementCounter] = useComputedSuperState(
+  () => getValue(counterStore.counter),   // Selector
+  [getField],                             // Dependencies of selector (like in useMemo or useCallback)
+  increment                               // Memoized version of setter function (not required)
+);
+
+function onClick() {
+  // Synchronously update a few fields in batch so that it triggers change listeners just once  
+  superAction(() => {
+    setValue(superState.counter, 15);
+    
+    // Warning: superState.counter is not yet updated at this point!
+    setValue(superState.counter, 20);
+  }) 
 }
-
-// An example of a computed property. It doesn't return value directly from
-// the store, but computes it based on one or many paths in the store. 
-function useUsersList() {
-  // Notice the .lazy part. This means the component using this hook does not rerender
-  // every time usersIndexState changes.
-  const [getIndex] = useState(usersIndexState).lazy;
-
-  return useComputedSuperState(() => {
-    return Object.entries(getIndex()).filter(([userId, value]) => value).map(([userId]) => userId)
-  }, [getIndex]);
-}
-
-function Users() {
-  const [usersIds] = useUsersList().live
-  return (
-    <>
-      {usersIds.map((userId) => <User id={userId} key={userId} />)}
-    </>
-  );
-}
-
-const User = React.memo((props: { id: string }) => {
-  const [user, setUser] = useUser(props.id);
-
-  return <div>{user.firstName}</div>
-})
 ```
-
-### API documentation
-
-TODO
 
 ## License
 
