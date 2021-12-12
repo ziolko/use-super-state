@@ -4,29 +4,27 @@ import { useSyncExternalStore } from "use-sync-external-store/shim";
 
 import {
   LazySuperState,
-  ReadOnlySuperState,
+  LazyOrLiveReadOnlySuperState,
   Subscriber,
-  SuperState,
+  LazyOrLiveSuperState,
   SuperStatePath,
-  SuperStatePathLeaf,
-  SuperStatePathObject,
   SynchronousCallback
 } from "./types";
 import ComputedState from "./computed-state";
-import StoreRootContext, { dependencyTracking } from "./store-root-context";
+import SuperStateRootContext, { dependencyTracking } from "./store-root-context";
 import { createPathProxy, storePathHash } from "./path-proxy";
 
 export function SuperStateProvider({ children }: PropsWithChildren<{}>) {
-  const value = useMemo(() => new StoreRootContext(), []);
-  return <storeRootContext.Provider value={value} children={children} />;
+  const value = useMemo(() => new SuperStateRootContext(), []);
+  return <superStateRootContext.Provider value={value} children={children} />;
 }
 
 export function createSuperState<T extends object>(factory: () => T, options?: { name?: string }): SuperStatePath<T> {
   return createPathProxy(factory, options ?? {});
 }
 
-export function useSuperState<T>(path: SuperStatePath<T>): SuperState<T> {
-  const rootContext = useContext(storeRootContext);
+export function useSuperState<T>(path: SuperStatePath<T>): LazyOrLiveSuperState<T> {
+  const rootContext = useContext(superStateRootContext);
 
   if (!rootContext) {
     throw  new Error("Not in context of the SuperStoreProvider");
@@ -60,8 +58,8 @@ export function useSuperState<T>(path: SuperStatePath<T>): SuperState<T> {
   return result as any;
 }
 
-export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown[]): ReadOnlySuperState<V>;
-export function useComputedSuperState<V>(getter: () => V, dependencies: unknown[], memoizedSetter: (value: V) => void): SuperState<V>;
+export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown[]): LazyOrLiveReadOnlySuperState<V>;
+export function useComputedSuperState<V>(getter: () => V, dependencies: unknown[], memoizedSetter: (value: V) => void): LazyOrLiveSuperState<V>;
 
 export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown[], memoizedSetter?: (value: V) => void): any {
   const memoizedGetter = useCallback(getter, dependencies as any);
@@ -88,7 +86,7 @@ export function useComputedSuperState<V>(getter: () => V, dependencies?: unknown
 }
 
 export function useLazySuperState(): LazySuperState {
-  const rootContext = useContext(storeRootContext);
+  const rootContext = useContext(superStateRootContext);
   if (!rootContext) {
     throw  new Error("Not in context of the SuperStoreProvider");
   }
@@ -108,9 +106,9 @@ export function superAction<T>(execute: SynchronousCallback<T>) {
   dependencyTracking.batchedUpdates = null;
 }
 
-// Internal details
-const storeRootContext = createContext<StoreRootContext | null>(null);
+export const superStateRootContext = createContext<SuperStateRootContext | null>(null);
 
+// Internal details
 function errorSetter() {
   throw new Error("No setter has been defined for the computed field");
 }

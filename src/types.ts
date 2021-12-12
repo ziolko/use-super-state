@@ -10,12 +10,12 @@ export type SuperStatePath<T> = [T] extends [object] ? SuperStatePathObject<T> :
 export type SuperStatePathObject<T extends object> = { readonly [Property in keyof T]: SuperStatePath<T[Property]>; }
 export type SuperStatePathLeaf<T> = T;
 
-export type SuperState<Value> = {
+export type LazyOrLiveSuperState<Value> = {
   live: [Value, (value: Value, options?: SuperStateSetterOptions) => void, () => Value];
   lazy: [() => Value, (value: Value, options?: SuperStateSetterOptions) => void];
 };
 
-export type ReadOnlySuperState<Value> = {
+export type LazyOrLiveReadOnlySuperState<Value> = {
   live: [Value, never, () => Value];
   lazy: [() => Value];
 };

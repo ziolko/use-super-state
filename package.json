@@ -1,6 +1,6 @@
 {
   "name": "use-super-state",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Shared state manager for ReactJS",
   "source": "src/index.tsx",
   "main": "dist/main.js",
